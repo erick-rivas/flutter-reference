@@ -17,7 +17,7 @@ class ViewModelPokemonDetail {
       pokemonDetailSubject = PublishSubject<Pokemon>();
       pokemonDetailSubject.sink.add(await pokemonRepository.getPokemonById(1));
     } catch(e) {
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
       pokemonDetailSubject.sink.addError(e);
       print(e);
     }
@@ -30,6 +30,8 @@ class ViewModelPokemonDetail {
 }
 
 class PokemonDetail extends StatefulWidget {
+  const PokemonDetail({Key? key}) : super(key: key);
+
   @override
   PokemonDetailState createState() => PokemonDetailState();
 }

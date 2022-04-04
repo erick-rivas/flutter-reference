@@ -1,0 +1,1 @@
+enum FORM_TYPE { SAVE, SET }
