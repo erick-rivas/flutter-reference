@@ -7,7 +7,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:reference_v2/data/apis/api_response.dart';
 import 'package:reference_v2/domain/team_domain.dart';
 import 'package:reference_v2/ui/common/loading.dart';
+import 'package:reference_v2/ui/common/styles.dart';
 import '../../data/model/team.dart';
+import '../../settings.dart';
+import '../../utils/globals.dart';
 import '../common/error.dart';
 
 class FormTeams extends StatefulWidget {
@@ -21,14 +24,15 @@ class FormTeams extends StatefulWidget {
 
 class _FormTeamsState extends State<FormTeams> {
 
-  late var viewModelTeamForm = ViewModelTeamForm(refresh);
-  late Team? team;
+  late var viewModelTeamForm = ViewModelTeamForm(() => setState((){}));
+  late FORM_TYPE formType;
 
   final TextEditingController _name = TextEditingController();
   final TextEditingController _description = TextEditingController();
   final TextEditingController _marketValue = TextEditingController();
   String? _rival = "Select rival";
   XFile? _logo;
+  Team? team;
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +40,9 @@ class _FormTeamsState extends State<FormTeams> {
       child: Scaffold(
         body: (){
           var apiResponse = viewModelTeamForm.response;
-          if(apiResponse.status == Status.LOADING) return const LoadingComponent();
+          if(apiResponse.status == Status.LOADING) return LoadingComponent(message: apiResponse.message!);
           if(apiResponse.status == Status.COMPLETED) return Container();
-          if(apiResponse.status == Status.ERROR) return const ErrorComponent();
+          if(apiResponse.status == Status.ERROR) return ErrorComponent(message: apiResponse.message!);
           if(apiResponse.status == Status.INITIAL) return getForm();
         }(),
       )
@@ -56,75 +60,21 @@ class _FormTeamsState extends State<FormTeams> {
               controller: _name,
               keyboardType: TextInputType.emailAddress,
               onChanged: (value) => setState((){ team?.name = _name.text; }),
-              decoration: InputDecoration(
-                fillColor: Theme.of(context).focusColor,
-                filled: _name.text.isNotEmpty,
-                border: InputBorder.none,
-                hintText: "Name",
-                contentPadding: EdgeInsets.all(18.sp),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.sp),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.sp),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                prefixIcon: Icon(Icons.person, color: Theme.of(context).primaryColor),
-                suffixIcon: _name.text.isNotEmpty
-                  ? Icon(Icons.check, color: Theme.of(context).accentColor)
-                  : const SizedBox()
-              ),
+              decoration: INPUT_STYLE(context, controller: _name, hint: "Name"),
             ),
             SizedBox(height: 0.05.sh),
             TextFormField(
               controller: _description,
               keyboardType: TextInputType.text,
               onChanged: (value) => setState((){ team?.description = _description.text; }),
-              decoration: InputDecoration(
-                fillColor: Theme.of(context).focusColor,
-                filled: _description.text.isNotEmpty,
-                border: InputBorder.none,
-                hintText: "Desrciption",
-                contentPadding: EdgeInsets.all(18.sp),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.sp),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.sp),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                prefixIcon: Icon(Icons.person, color: Theme.of(context).primaryColor),
-                suffixIcon: _description.text.isNotEmpty
-                  ? Icon(Icons.check, color: Theme.of(context).accentColor)
-                  : const SizedBox()
-              ),
+              decoration: INPUT_STYLE(context, controller: _description, hint: "Description"),
             ),
             SizedBox(height: 0.05.sh),
             TextFormField(
               controller: _marketValue,
               keyboardType: TextInputType.number,
               onChanged: (value) => setState((){ team?.marketValue = double.parse(_marketValue.text); }),
-              decoration: InputDecoration(
-                fillColor: Theme.of(context).focusColor,
-                filled: _marketValue.text.isNotEmpty,
-                border: InputBorder.none,
-                hintText: "Market value",
-                contentPadding: EdgeInsets.all(18.sp),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.sp),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.sp),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                prefixIcon: Icon(Icons.person, color: Theme.of(context).primaryColor),
-                suffixIcon: _marketValue.text.isNotEmpty
-                  ? Icon(Icons.check, color: Theme.of(context).accentColor)
-                  : const SizedBox()
-              ),
+              decoration: INPUT_STYLE(context, controller: _marketValue, hint: "Market value"),
             ),
             SizedBox(height: 0.05.sh),
             DropdownButton(
@@ -156,7 +106,17 @@ class _FormTeamsState extends State<FormTeams> {
             ),
             SizedBox(height: 0.05.sh),
             GestureDetector(
-              child: _logo == null ? Image.asset("assets/images/image_pick.png") : Image.file(File(_logo!.path)),
+              child: () {
+
+                if(team != null && team!.logo != null && team!.logo["name"] != null)
+                  return Image.network("$MEDIA_URL/" + team!.logo["name"]);
+
+                if(_logo == null)
+                  return Image.asset("assets/images/image_pick.png");
+
+                return Image.file(File(_logo!.path));
+
+              } (),
               onTap: () {
                 ImagePicker().pickImage(source: ImageSource.gallery)
                   .then((value) => setState((){
@@ -166,12 +126,30 @@ class _FormTeamsState extends State<FormTeams> {
               },
             ),
             SizedBox(height: 0.05.sh),
-            ElevatedButton(
-              onPressed: () {
-                viewModelTeamForm.saveTeam();
-              },
-              child: Text("Save")
-            )
+            SizedBox(
+              width: 1.sw,
+              height: 0.07.sh,
+              child: ElevatedButton(
+                style: BUTTON_STYLE(context, color: Theme.of(context).accentColor),
+                onPressed: () async {
+                  var result = true;
+
+                  if(formType == FORM_TYPE.SAVE)
+                    result = await viewModelTeamForm.saveTeam(team!, _logo!.path);
+                  else
+                    result = await viewModelTeamForm.setTeam(team!, _logo == null ? null : _logo!.path);
+
+                  if(!result)
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("An error has ocurred"),
+                    ));
+
+                  if(result) Navigator.pop(context, result);
+                },
+                child: const Text("Save")
+              ),
+            ),
+            SizedBox(height: 0.05.sh),
           ],
         ),
       ),
@@ -192,10 +170,19 @@ class _FormTeamsState extends State<FormTeams> {
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       var args = ModalRoute.of(context)!.settings.arguments! as dynamic;
       team = args["team"] as Team?;
+      formType = args["type"] as FORM_TYPE;
+      initData();
     });
 
   }
 
-  void refresh() => setState(() {});
+  void initData() {
+
+    _name.text = team!.name??"";
+    _description.text = team!.description??"";
+    _marketValue.text = team!.marketValue == null ? "" : team!.marketValue.toString();
+    _rival = team!.rival == null || team!.rival!.id == null ? "Select rival" : team!.rival!.id!.toString();
+
+  }
 
 }

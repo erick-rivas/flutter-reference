@@ -1,6 +1,6 @@
 import 'package:graphql/client.dart';
 
-import '../gql/const.dart';
+import 'const.dart';
 
 class GraphQL {
 
@@ -49,7 +49,7 @@ class GraphQL {
     var query = normalizedQuery.replaceFirst(queryName!, wrapper);
 
     // Execute query
-    return _client.query(QueryOptions(document: gql(query)));
+    return _client.query(QueryOptions(document: gql(query), fetchPolicy: FetchPolicy.networkOnly));
 
   }
 
@@ -67,8 +67,6 @@ class GraphQL {
     return query(gqlQuery, paramQuery: paramQuery, options: {...options, "cacheQuery": false});
   }
 
-  // TODO Check options & refetchQueries
-
   dynamic detail(String gqlQuery, int id, {dynamic options}) {
 
     var normalizedQuery = normalizeQuery(gqlQuery);
@@ -79,26 +77,20 @@ class GraphQL {
     var query = normalizedQuery.replaceAll(queryName!, wrapper);
 
     //  Execute query
-    return _client.query(QueryOptions(document: gql(query)));
+    return _client.query(QueryOptions(document: gql(query), fetchPolicy: FetchPolicy.networkOnly));
     
   }
 
-  dynamic save(String gqlQuery, int id, {dynamic options}) {
-    var query = normalizeQuery(gqlQuery);
-    return _client.mutate(MutationOptions(document: gql(query)));
+  dynamic save(String gqlQuery, {dynamic options}) {
+    return _client.mutate(MutationOptions(document: gql(gqlQuery), variables: options, fetchPolicy: FetchPolicy.networkOnly));
   }
 
   dynamic set(String gqlQuery, {dynamic options}) {
-    return _client.mutate(MutationOptions(document: gql(gqlQuery)));
+    return _client.mutate(MutationOptions(document: gql(gqlQuery), variables: options, fetchPolicy: FetchPolicy.networkOnly));
   }
 
   dynamic delete(String gqlQuery, {dynamic options}) {
-    var query = normalizeQuery(gqlQuery);
-    return _client.mutate(MutationOptions(document: gql(gqlQuery)));
-  }
-
-  mutate(String mutation) {
-    // TODO check mutations
+    return _client.mutate(MutationOptions(document: gql(gqlQuery), variables: options, fetchPolicy: FetchPolicy.networkOnly));
   }
 
   String normalizeQuery(String gqlQuery) {
@@ -146,20 +138,6 @@ class GraphQL {
         res.add(SINGULARS[model]);
 
     return res;
-
-  }
-
-  bool hasCommonModels(String gqlQueryA, String gqlQueryB) {
-
-    var aModels = getModelNames(gqlQueryA);
-    var bModels = getModelNames(gqlQueryB);
-
-    for(var aModel in aModels)
-      for(var bModel in bModels)
-        if(aModel == bModel)
-          return true;
-
-    return false;
 
   }
 

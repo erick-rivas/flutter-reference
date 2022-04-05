@@ -36,12 +36,12 @@ class Team {
   Map<String, dynamic> toJSON() {
     return {
       "id": id,
-      "createdAt": createdAt,
+      "createdAt": createdAt?.toIso8601String(),
       "name": name,
       "logo": logo,
       "description": description,
       "marketValue": marketValue,
-      "rival": rival
+      "rival": rival == null || rival!.id == null ? null : rival!.id
     };
   }
 

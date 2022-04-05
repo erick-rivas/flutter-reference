@@ -41,16 +41,21 @@ class HttpHandler {
   }
 
   Future<dynamic> UPLOAD_FILE(String url, String path) async {
-    
+
+    dynamic responseJson;
+
     try {
       var request = MultipartRequest("POST", Uri.parse(url));
       request.files.add(await MultipartFile.fromPath("file", path, contentType: MediaType("multipart", "form-data")));
       var response = await request.send();
-      print(response.statusCode);
+      var responseStr = await Response.fromStream(response);
+      responseJson = _getResponse(responseStr);
     }
     on SocketException {
-
+      throw FetchDataException('No Internet Connection');
     }
+
+    return responseJson;
     
   }
 
@@ -66,6 +71,9 @@ class HttpHandler {
   dynamic _getResponse(Response response) {
     switch (response.statusCode) {
       case 200:
+        dynamic responseJson = jsonDecode(response.body);
+        return responseJson;
+      case 201:
         dynamic responseJson = jsonDecode(response.body);
         return responseJson;
       case 400:
