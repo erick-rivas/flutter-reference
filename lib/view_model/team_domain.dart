@@ -1,6 +1,6 @@
-import 'package:reference_v2/data/model/team.dart';
-import 'package:reference_v2/data/repository/team_repository.dart';
-import '../data/apis/api_response.dart';
+import 'package:reference_v2/repository/team_repository.dart';
+import 'package:reference_v2/repository/base_response.dart';
+import 'package:reference_v2/seed/models/team.dart';
 
 class ViewModelTeamList {
 
@@ -8,18 +8,18 @@ class ViewModelTeamList {
   ViewModelTeamList(this.refresh);
 
   final TeamRepository _teamRepository = TeamRepository();
-  ApiResponse _apiResponse = ApiResponse.initial('Empty data');
+  BaseResponse _apiResponse = BaseResponse.initial('Empty data');
 
   List<Team> _teams = [];
   int _page = 1;
 
-  ApiResponse get response => _apiResponse;
+  BaseResponse get response => _apiResponse;
   List<Team> get teams => _teams;
 
   listTeams() async {
 
     if(_apiResponse.status == Status.INITIAL) {
-      _apiResponse = ApiResponse.loading('Fetching data');
+      _apiResponse = BaseResponse.loading('Fetching data');
       refresh();
     }
 
@@ -27,11 +27,11 @@ class ViewModelTeamList {
 
       List<Team> teams = await _teamRepository.listTeams(_page, 15);
       _teams.addAll(teams);
-      _apiResponse = ApiResponse.completed(_teams);
+      _apiResponse = BaseResponse.completed(_teams);
       _page++;
 
     } catch (e) {
-      _apiResponse = ApiResponse.error(e.toString());
+      _apiResponse = BaseResponse.error(e.toString());
       print(e);
     }
 
@@ -42,7 +42,7 @@ class ViewModelTeamList {
   reloadTeams() {
     _page = 1;
     _teams.clear();
-    _apiResponse = ApiResponse.initial('Empty data');
+    _apiResponse = BaseResponse.initial('Empty data');
     listTeams();
   }
 
@@ -54,11 +54,11 @@ class ViewModelTeamForm {
   ViewModelTeamForm(this.refresh);
 
   final TeamRepository _teamRepository = TeamRepository();
-  ApiResponse _apiResponse = ApiResponse.initial('Empty data');
+  BaseResponse _apiResponse = BaseResponse.initial('Empty data');
 
   List<int> _teamsId = [];
 
-  ApiResponse get response => _apiResponse;
+  BaseResponse get response => _apiResponse;
   List<int> get teamsId => _teamsId;
 
   listTeamsId() async {
@@ -66,7 +66,7 @@ class ViewModelTeamForm {
     try {
       _teamsId = await _teamRepository.listAllTeamsId();
     } catch (e) {
-      _apiResponse = ApiResponse.error(e.toString());
+      _apiResponse = BaseResponse.error(e.toString());
       print(e);
     }
 

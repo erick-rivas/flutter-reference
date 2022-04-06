@@ -1,14 +1,14 @@
-import 'package:reference_v2/data/model/team.dart';
+import 'team.dart';
 
 class Player {
 
-  late int id;
-  late DateTime createdAt;
-  late String name;
-  late int photo;
-  late bool isActive;
-  late Team team;
-  late int position;
+  late int? id;
+  late DateTime? createdAt;
+  late String? name;
+  late int? photo;
+  late bool? isActive;
+  late Team? team;
+  late int? position;
 
   Player({
     required this.id,
@@ -22,22 +22,22 @@ class Player {
 
   Player.fromJSON(dynamic json) {
     id = json["id"];
-    createdAt = json["created_at"].toDate();
+    createdAt = json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]);
     name = json["name"];
     photo = json["photo"];
-    isActive = json["is_Active"];
-    team = json["team"];
+    isActive = json["isActive"];
+    team = Team.fromJSON(json["team"]);
     position = json["position"];
   }
 
   Map<String, dynamic> toJSON() {
     return {
       "id": id,
-      "created_at": createdAt,
+      "createdAt": createdAt?.toIso8601String(),
       "name": name,
       "photo": photo,
-      "is_Active": isActive,
-      "team": team,
+      "isActive": isActive,
+      "team": team?.toJSON(),
       "position": position
     };
   }

@@ -1,8 +1,8 @@
 class PlayerPosition {
 
-  late int id;
-  late DateTime createdAt;
-  late String name;
+  late int? id;
+  late DateTime? createdAt;
+  late String? name;
   late dynamic details;
 
   PlayerPosition({
@@ -14,7 +14,7 @@ class PlayerPosition {
 
   PlayerPosition.fromJSON(dynamic json) {
     id = json["id"];
-    createdAt = json["created_at"].toDate();
+    createdAt = json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]);
     name = json["name"];
     details = json["details"];
   }
@@ -22,7 +22,7 @@ class PlayerPosition {
   Map<String, dynamic> toJSON() {
     return {
       "id": id,
-      "created_at": createdAt,
+      "createdAt": createdAt?.toIso8601String(),
       "name": name,
       "details": details
     };

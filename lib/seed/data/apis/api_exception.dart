@@ -1,3 +1,4 @@
+// Class which allows http error management
 class AppException implements Exception {
   final _message;
   final _prefix;
@@ -9,9 +10,9 @@ class AppException implements Exception {
   }
 }
 
+// Create different exceptions using AppException as base
 class FetchDataException extends AppException {
-  FetchDataException([String? message])
-      : super(message, "Error During Communication: ");
+  FetchDataException([String? message]) : super(message, "Error During Communication: ");
 }
 
 class BadRequestException extends AppException {

@@ -1,4 +1,4 @@
-import 'package:reference_v2/data/model/team.dart';
+import 'team.dart';
 
 class User {
 
@@ -28,7 +28,7 @@ class User {
 
   User.fromJSON(dynamic json) {
     id = json["id"];
-    createdAt = DateTime.parse(json["createdAt"]);
+    createdAt = json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]);
     username = json["username"];
     firstName = json["firstName"];
     lastName = json["lastName"];
@@ -42,7 +42,7 @@ class User {
   Map<String, dynamic> toJSON() {
     return {
       "id": id,
-      "createdAt": createdAt,
+      "createdAt": createdAt?.toIso8601String(),
       "username": username,
       "firstName": firstName,
       "lastName": lastName,

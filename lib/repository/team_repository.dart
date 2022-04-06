@@ -1,13 +1,12 @@
-import 'package:reference_v2/data/gql/graphql.dart';
-import 'package:reference_v2/data/apis/http_handler.dart';
-import 'package:reference_v2/data/gql/queries.dart';
-import 'package:reference_v2/data/model/team.dart';
-
-import '../../settings.dart';
+import 'package:reference_v2/seed/models/team.dart';
+import 'package:reference_v2/seed/data/gql/queries.dart';
+import 'package:reference_v2/settings.dart';
+import 'package:reference_v2/seed/gql.dart';
+import 'package:reference_v2/seed/api.dart';
 
 class TeamRepository {
 
-  GraphQL graphQL = GraphQL(GRAPH_URL);
+  GraphQL graphQL = GraphQL();
 
   Future<dynamic> listAllTeamsId() async {
 
@@ -68,10 +67,10 @@ class TeamRepository {
     try {
 
       HttpHandler handler = HttpHandler();
-      var response = await handler.UPLOAD_FILE(API_URL + "/files/", logoPath);
+      var response = await handler.UPLOAD_FILE(API_URL + "/files/", path: logoPath);
       team.logo = response["id"];
 
-      var res = await graphQL.save(SAVE_TEAM, options: team.toJSON());
+      var res = await graphQL.save(SAVE_TEAM, variables: team.toJSON());
       return !res.hasException;
 
     } catch(e) {
@@ -86,13 +85,13 @@ class TeamRepository {
 
       if(logoPath != null) {
         HttpHandler handler = HttpHandler();
-        var response = await handler.UPLOAD_FILE(API_URL + "/files/", logoPath);
+        var response = await handler.UPLOAD_FILE(API_URL + "/files/", path: logoPath);
         team.logo = response["id"];
       }
 
       team.logo = team.logo["id"];
 
-      var res = await graphQL.set(SET_TEAM, options: team.toJSON());
+      var res = await graphQL.set(SET_TEAM, variables: team.toJSON());
       return !res.hasException;
 
     } catch(e) {
@@ -104,7 +103,7 @@ class TeamRepository {
   Future<dynamic> deleteTeam(Team team) async {
 
     try {
-      var res = await graphQL.delete(DELETE_TEAM, options: team.toJSON());
+      var res = await graphQL.delete(DELETE_TEAM, variables: team.toJSON());
       return !res.hasException;
     } catch(e) {
       print(e);

@@ -1,12 +1,12 @@
-import 'package:reference_v2/data/model/player.dart';
+import 'player.dart';
 
 class Score {
 
-  late int id;
-  late DateTime createdAt;
-  late int min;
-  late Player player;
-  late String match;
+  late int? id;
+  late DateTime? createdAt;
+  late int? min;
+  late Player? player;
+  late String? match;
 
   Score({
     required this.id,
@@ -18,18 +18,18 @@ class Score {
 
   Score.fromJSON(dynamic json) {
     id = json["id"];
-    createdAt = json["created_at"].toDate();
+    createdAt = json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]);
     min = json["min"];
-    player = json["player"];
+    player = Player.fromJSON(json["player"]);
     match = json["match"];
   }
 
   Map<String, dynamic> toJSON() {
     return {
       "id": id,
-      "created_at": createdAt,
+      "createdAt": createdAt?.toIso8601String(),
       "min": min,
-      "player": player,
+      "player": player?.toJSON(),
       "match": match
     };
   }

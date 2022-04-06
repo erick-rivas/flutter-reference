@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:reference_v2/router.dart';
+import 'package:reference_v2/ui/router.dart';
 import 'package:reference_v2/ui/common/styles.dart';
 
 Future<void> main() async {
