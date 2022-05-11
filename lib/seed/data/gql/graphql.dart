@@ -1,4 +1,5 @@
 import 'package:graphql/client.dart';
+import 'package:reference_v2/seed/cache.dart';
 import 'package:reference_v2/settings.dart';
 import 'package:reference_v2/seed/data/gql/const.dart';
 
@@ -51,12 +52,15 @@ class GraphQLCore {
     return res;
   }
 
-  dynamic manageResponse(Future<QueryResult> futureResult) async {
+  dynamic manageResponse(Future<QueryResult> futureResult, String query, {bool? useCache, String? method, dynamic variables}) async {
     var res = await futureResult;
 
     if(res.hasException) {
-      if(res.exception?.linkException is NetworkException)
+      if(res.exception?.linkException is NetworkException) {
+        if(useCache != null && useCache)
+          CacheAPI().savePendingGQLRequest(GRAPH_URL, method!, query, variables: variables??{});
         throw NetworkException(uri: Uri.parse(GRAPH_URL));
+      }
       else
         throw Exception("A problem has ocurred with GrahpQL: ${res.exception!.linkException!.originalException}");
     }

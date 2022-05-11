@@ -1,4 +1,5 @@
 import 'package:graphql/client.dart';
+import 'package:reference_v2/seed/cache.dart';
 import 'package:reference_v2/seed/data/gql/graphql.dart';
 import 'package:reference_v2/settings.dart';
 
@@ -27,10 +28,31 @@ class GraphQL extends GraphQLCore {
 
   }
 
+  /// Execute pending http requests when the phone is offline
+  void retryFailedRequests() async {
+
+    var requests = await CacheAPI().getPendingGQLRequests();
+    await CacheAPI().clearPendingGQLRequest();
+
+    for(var request in requests["QUERY"])
+      await query(request["query"], useCache: true);
+
+    for(var request in requests["SAVE"])
+      await save(request["query"], variables: requests["variables"], useCache: true);
+
+    for(var request in requests["SET"])
+      await set(request["query"], variables: requests["variables"], useCache: true);
+
+    for(var request in requests["DELETE"])
+      await delete(request["query"], variables: requests["variables"], useCache: true);
+
+  }
+
   /// Return a GraphQL query response as Map<dynamic, dynamic>
   /// @param [gqlQuery] GraphQL Query
   /// @param [paramQuery] query param (sql alike)
   /// @param [options] extra query options
+  /// @param [useCache] save in cache the request
   /// @example
   /// var response = gql.query("""
   /// {
@@ -39,7 +61,7 @@ class GraphQL extends GraphQLCore {
   ///     age
   ///   }
   /// }""", extraParams: "name=cristiano")
-  dynamic query(String gqlQuery, {String? paramQuery, dynamic extraParams}) async {
+  dynamic query(String gqlQuery, {String? paramQuery, dynamic extraParams, bool? useCache}) async {
 
     var normalizedQuery = normalizeQuery(gqlQuery);
     var queryName = getHeaderNames(gqlQuery)[0];
@@ -68,7 +90,10 @@ class GraphQL extends GraphQLCore {
           document: gql(query),
           fetchPolicy: FetchPolicy.networkOnly
         )
-      )
+      ),
+      query,
+      useCache: useCache,
+      method: "QUERY"
     );
 
   }
@@ -78,6 +103,7 @@ class GraphQL extends GraphQLCore {
   /// @param [pageNum] page number
   /// @param [pageSize] number of objects per page
   /// @param [paramQuery] query param (sql alike)
+  /// @param [useCache] save in cache the request
   /// @example
   /// var response = gql.pagination("""
   /// {
@@ -88,21 +114,23 @@ class GraphQL extends GraphQLCore {
   ///     }
   ///   }
   /// }""", 1, 15, paramQuery: "position=mainStriker")
-  dynamic pagination(String gqlQuery, int pageNum, int pageSize, {String? paramQuery}) async => await query(
+  dynamic pagination(String gqlQuery, int pageNum, int pageSize, {String? paramQuery,  bool? useCache}) async => await query(
       gqlQuery,
       paramQuery: paramQuery,
       extraParams: {
         "pageNum": pageNum,
         "pageSize": pageSize
-      }
+      },
+    useCache: useCache
     );
 
   /// Return a GraphQL query count response as Map<dynamic, dynamic>
   /// @param [modelName] GraphQL model name
   /// @param [paramQuery] query param (sql alike)
+  /// @param [useCache] save in cache the request
   /// @example
   /// var response = gql.count("player", paramQuery: "position:mainStriker")
-  dynamic count(String modelName, {String? paramQuery}) async {
+  dynamic count(String modelName, {String? paramQuery, bool? useCache}) async {
     var gqlQuery = """
     {
       ${modelName}Count {
@@ -110,12 +138,13 @@ class GraphQL extends GraphQLCore {
       }
     }
     """;
-    return await query(gqlQuery, paramQuery: paramQuery);
+    return await query(gqlQuery, paramQuery: paramQuery, useCache: useCache);
   }
 
   /// Return a GraphQL detail query (single object)
   /// @param [gqlQuery] GraphQL query
   /// @param [id] identifier of the object
+  /// @param [useCache] save in cache the request
   /// @example
   /// var response = gql.detail("""
   /// {
@@ -126,7 +155,7 @@ class GraphQL extends GraphQLCore {
   ///     }
   ///   }
   /// }""", 1)
-  dynamic detail(String gqlQuery, int id) async {
+  dynamic detail(String gqlQuery, int id, bool? useCache) async {
 
     var normalizedQuery = normalizeQuery(gqlQuery);
     var queryName = getHeaderNames(normalizedQuery)[0];
@@ -142,7 +171,9 @@ class GraphQL extends GraphQLCore {
           document: gql(query),
           fetchPolicy: FetchPolicy.networkOnly
         )
-      )
+      ),
+      query,
+      useCache: useCache
     );
 
   }
@@ -150,51 +181,66 @@ class GraphQL extends GraphQLCore {
   /// Return a GraphQL response after execute a save mutation
   /// @param [gqlQuery] GraphQL query
   /// @param [variables] object values
+  /// @param [useCache] save in cache the request
   /// @example
   /// var response = gql.save(SAVE_PLAYER, variables: {"name": "cristiano"})
-  dynamic save(String gqlQuery, {dynamic variables}) async {
+  dynamic save(String query, {dynamic variables, bool? useCache}) async {
     return await manageResponse(
       _client.mutate(
         MutationOptions(
-          document: gql(gqlQuery),
+          document: gql(query),
           variables: variables,
           fetchPolicy: FetchPolicy.networkOnly
         )
-      )
+      ),
+      query,
+      variables: variables,
+      useCache: useCache,
+      method: "SAVE"
     );
   }
 
   /// Return a GraphQL response after execute a set mutation
-  /// @param [gqlQuery] GraphQL query
+  /// @param [query] GraphQL query
   /// @param [variables] object values
+  /// @param [useCache] save in cache the request
   /// @example
   /// var response = gql.save(SAVE_PLAYER, variables: {"id": 1, "name": "cristiano ronaldo"})
-  dynamic set(String gqlQuery, {dynamic variables}) async {
+  dynamic set(String query, {dynamic variables, bool? useCache}) async {
     return await manageResponse(
       _client.mutate(
         MutationOptions(
-          document: gql(gqlQuery),
+          document: gql(query),
           variables: variables,
           fetchPolicy: FetchPolicy.networkOnly
         )
-      )
+      ),
+      query,
+      useCache: useCache,
+      variables: variables,
+      method: "SET"
     );
   }
 
   /// Return a GraphQL response after execute a delete mutation
-  /// @param [gqlQuery] GraphQL query
+  /// @param [query] GraphQL query
   /// @param [variables] object values
+  /// @param [useCache] save in cache the request
   /// @example
   /// var response = gql.save(SAVE_PLAYER, variables: {"id": 1})
-  dynamic delete(String gqlQuery, {dynamic variables}) async {
+  dynamic delete(String query, {dynamic variables, bool? useCache}) async {
     return await manageResponse(
       _client.mutate(
         MutationOptions(
-          document: gql(gqlQuery),
+          document: gql(query),
           variables: variables,
           fetchPolicy: FetchPolicy.networkOnly
         )
-      )
+      ),
+      query,
+      useCache: useCache,
+      variables: variables,
+      method: "DELETE"
     );
   }
 
