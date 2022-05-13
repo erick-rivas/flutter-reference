@@ -1,6 +1,8 @@
-import 'package:reference_v2/repository/team_repository.dart';
-import 'package:reference_v2/repository/base_response.dart';
-import 'package:reference_v2/seed/models/team.dart';
+import 'package:reference/repository/team_repository.dart';
+import 'package:reference/repository/base_response.dart';
+import 'package:reference/seed/models/team.dart';
+
+import '../seed/datasources/response.dart';
 
 class ViewModelTeamList {
 
@@ -23,16 +25,15 @@ class ViewModelTeamList {
       refresh();
     }
 
-    try {
+    Result result = await _teamRepository.listTeams(_page, 15);
 
-      List<Team> teams = await _teamRepository.listTeams(_page, 15);
+    if(result.status == StatusResponse.OK) {
       _teams.addAll(teams);
       _apiResponse = BaseResponse.completed(_teams);
       _page++;
-
-    } catch (e) {
-      _apiResponse = BaseResponse.error(e.toString());
-      print(e);
+    }
+    else {
+      _apiResponse = BaseResponse.error(result.status.toString());
     }
 
     refresh();
@@ -63,12 +64,12 @@ class ViewModelTeamForm {
 
   listTeamsId() async {
 
-    try {
-      _teamsId = await _teamRepository.listAllTeamsId();
-    } catch (e) {
-      _apiResponse = BaseResponse.error(e.toString());
-      print(e);
-    }
+    Result result = await _teamRepository.listAllTeamsId();
+
+    if(result.status == StatusResponse.OK)
+      _teamsId = result.data;
+    else
+      _apiResponse = BaseResponse.error(result.status.toString());
 
     refresh();
 

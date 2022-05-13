@@ -1,8 +1,7 @@
-import 'dart:typed_data';
-
-import 'package:reference_v2/seed/files.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:typed_data';
 import 'dart:convert';
+import 'files.dart';
 
 class CacheAPI {
 

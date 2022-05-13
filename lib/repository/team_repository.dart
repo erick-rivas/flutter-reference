@@ -1,8 +1,10 @@
-import 'package:reference_v2/seed/models/team.dart';
-import 'package:reference_v2/seed/data/gql/queries.dart';
-import 'package:reference_v2/settings.dart';
-import 'package:reference_v2/seed/gql.dart';
-import 'package:reference_v2/seed/api.dart';
+import 'package:reference/seed/models/team.dart';
+import 'package:reference/seed/datasources/gql/queries.dart';
+import 'package:reference/settings.dart';
+import 'package:reference/seed/gql.dart';
+import 'package:reference/seed/api.dart';
+
+import '../seed/datasources/response.dart';
 
 class TeamRepository {
 
@@ -15,14 +17,17 @@ class TeamRepository {
       String query = "{ teams { } }";
 
       var res = await graphQL.query(query);
+      var data = [];
 
-      if (res.data != null)
-        return List<int>.from(res.data["teams"].map((team) => team["id"]).toList());
+      if(res.status == StatusResponse.OK)
+        if(res.data != null)
+          data = List<int>.from(res.data["teams"].map((team) => team["id"]).toList());
 
-      return [];
+      return Result(data: data, status: res.status);
 
     } catch(e) {
       print(e);
+      return Result(data: null, status: StatusResponse.UNKNOWN_ERROR);
     }
 
   }
@@ -50,14 +55,17 @@ class TeamRepository {
       }""";
 
       var res = await graphQL.pagination(listGQL, page, number);
+      var data = [];
 
-      if (res.data != null)
-        return List<Team>.from(res.data["teamPagination"]["teams"].map((team) => Team.fromJSON(team)).toList());
+      if(res.status == StatusResponse.OK)
+        if(res.data != null)
+          data = List<Team>.from(res.data["teamPagination"]["teams"].map((team) => Team.fromJSON(team)).toList());
 
-      return [];
+      return Result(data: data, status: res.status);
 
     } catch(e) {
       print(e);
+      return Result(data: null, status: StatusResponse.UNKNOWN_ERROR);
     }
 
   }
@@ -71,10 +79,11 @@ class TeamRepository {
       team.logo = response["id"];
 
       var res = await graphQL.save(SAVE_TEAM, variables: team.toJSON());
-      return !res.hasException;
+      return res.status != StatusResponse.OK;
 
     } catch(e) {
       print(e);
+      return false;
     }
 
   }
@@ -92,10 +101,11 @@ class TeamRepository {
       team.logo = team.logo["id"];
 
       var res = await graphQL.set(SET_TEAM, variables: team.toJSON());
-      return !res.hasException;
+      return res.status != StatusResponse.OK;
 
     } catch(e) {
       print(e);
+      return false;
     }
 
   }
@@ -104,9 +114,10 @@ class TeamRepository {
 
     try {
       var res = await graphQL.delete(DELETE_TEAM, variables: team.toJSON());
-      return !res.hasException;
+      return res.status != StatusResponse.OK;
     } catch(e) {
       print(e);
+      return false;
     }
 
   }

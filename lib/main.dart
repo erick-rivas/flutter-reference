@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:reference_v2/seed/network.dart';
-import 'package:reference_v2/ui/router.dart';
-import 'package:reference_v2/ui/common/styles.dart';
+import 'package:reference/seed/datasources/network.dart';
+import 'package:reference/ui/router.dart';
+import 'package:reference/ui/common/styles.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:reference_v2/ui/common/styles.dart';
-import 'package:reference_v2/seed/helpers/loading.dart';
-import 'package:reference_v2/seed/models/team.dart';
-import 'package:reference_v2/seed/utils.dart';
-import 'package:reference_v2/view_model/team_domain.dart';
+import 'package:reference/ui/common/styles.dart';
+import 'package:reference/seed/helpers/loading.dart';
+import 'package:reference/seed/models/team.dart';
+import 'package:reference/seed/utils.dart';
+import 'package:reference/view_model/team_vm.dart';
 
 class DetailTeam extends StatefulWidget {
 

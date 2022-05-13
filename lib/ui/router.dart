@@ -1,7 +1,7 @@
-import 'package:reference_v2/ui/auth/login.dart';
-import 'package:reference_v2/ui/team/detail.dart';
-import 'package:reference_v2/ui/team/form.dart';
-import 'package:reference_v2/ui/team/list.dart';
+import 'package:reference/ui/auth/login.dart';
+import 'package:reference/ui/team/detail.dart';
+import 'package:reference/ui/team/form.dart';
+import 'package:reference/ui/team/list.dart';
 
 var router = {
   '/examples/login': (context) => const Login(),

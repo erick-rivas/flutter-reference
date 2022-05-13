@@ -1,4 +1,3 @@
-
 /// A function which works like enumerate in Python, this return an iterator map with the element index
 /// @param [items] an iterable
 /// @param [f] an anonymous function

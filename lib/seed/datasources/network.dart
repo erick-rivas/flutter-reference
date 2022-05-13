@@ -1,7 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:async';
-import 'api.dart';
-import 'gql.dart';
+import '../api.dart';
+import '../gql.dart';
 
 enum NetworkStatus { ONLINE, OFFLINE }
 

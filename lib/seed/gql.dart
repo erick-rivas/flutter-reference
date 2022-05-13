@@ -1,7 +1,7 @@
 import 'package:graphql/client.dart';
-import 'package:reference_v2/seed/cache.dart';
-import 'package:reference_v2/seed/data/gql/graphql.dart';
-import 'package:reference_v2/settings.dart';
+import 'datasources/cache.dart';
+import 'datasources/gql/gql_core.dart';
+import 'package:reference/settings.dart';
 
 /// @module gql
 

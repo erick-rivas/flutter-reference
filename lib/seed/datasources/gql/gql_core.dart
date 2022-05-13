@@ -1,7 +1,8 @@
 import 'package:graphql/client.dart';
-import 'package:reference_v2/seed/cache.dart';
-import 'package:reference_v2/settings.dart';
-import 'package:reference_v2/seed/data/gql/const.dart';
+import 'package:reference/seed/datasources/response.dart';
+import 'package:reference/settings.dart';
+import '../gql/const.dart';
+import '../cache.dart';
 
 class GraphQLCore {
 
@@ -57,18 +58,19 @@ class GraphQLCore {
 
     if(res.hasException) {
       if(res.exception?.linkException is NetworkException) {
-        if(useCache != null && useCache)
-          CacheAPI().savePendingGQLRequest(GRAPH_URL, method!, query, variables: variables??{});
-        throw NetworkException(uri: Uri.parse(GRAPH_URL));
+        if (useCache != null && useCache)
+          CacheAPI().savePendingGQLRequest(
+              GRAPH_URL, method!, query, variables: variables ?? {});
+        return Result(data: null, status: StatusResponse.NETWORK_ERROR);
       }
       else
-        throw Exception("A problem has ocurred with GrahpQL: ${res.exception!.linkException!.originalException}");
+        return Result(data: null, status: StatusResponse.UNKNOWN_ERROR);
     }
 
     assert(res.data != null);
 
     if(res.data!.isNotEmpty)
-      return res.data;
+      return Result(data: res.data, status: StatusResponse.OK);
 
     return {};
   }

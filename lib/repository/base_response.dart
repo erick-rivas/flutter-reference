@@ -1,4 +1,5 @@
 class BaseResponse<T> {
+
   Status status;
   T? data;
   String? message;
@@ -15,6 +16,7 @@ class BaseResponse<T> {
   String toString() {
     return "Status : $status \n Message : $message \n Data : $data";
   }
+
 }
 
 enum Status { INITIAL, LOADING, COMPLETED, ERROR }
