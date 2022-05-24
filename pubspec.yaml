@@ -1,0 +1,35 @@
+name: reference
+description: A new Flutter project.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.16.1 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  http: ^0.13.4
+  graphql: ^5.0.1
+  flutter_screenutil: ^5.3.1
+  connectivity_plus: ^2.3.0
+  image_picker: ^0.8.4+11
+  provider: ^6.0.2
+  shared_preferences: ^2.0.15
+  path_provider: ^2.0.10
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^1.0.0
+
+flutter:
+
+  uses-material-design: true
+  assets:
+    - assets/images/
