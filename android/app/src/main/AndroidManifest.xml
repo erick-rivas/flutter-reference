@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:label="reference_v2"
+        android:label="reference"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
