@@ -12,19 +12,19 @@ class GraphQL extends GraphQLCore {
 
   GraphQL() {
 
-    String token = ""; // TODO make token module
+    CacheAPI().getToken().then((String? token) {
+      final _httpLink = HttpLink(GRAPH_URL);
+      final _authLink = AuthLink(
+          getToken: () async => "Token ${token??""}"
+      );
 
-    final _httpLink = HttpLink(GRAPH_URL);
-    final _authLink = AuthLink(
-        getToken: () async => "Token $token"
-    );
-
-    _link = _authLink.concat(_httpLink);
-    _link = _httpLink;
-    _client = GraphQLClient(
-      cache: GraphQLCache(),
-      link: _link,
-    );
+      _link = _authLink.concat(_httpLink);
+      _link = _httpLink;
+      _client = GraphQLClient(
+        cache: GraphQLCache(),
+        link: _link,
+      );
+    });
 
   }
 
@@ -60,7 +60,7 @@ class GraphQL extends GraphQLCore {
   ///     name,
   ///     age
   ///   }
-  /// }""", extraParams: "name=cristiano")
+  /// }""", paramQuery: "name=cristiano")
   dynamic query(String gqlQuery, {String? paramQuery, dynamic extraParams, bool? useCache}) async {
 
     var normalizedQuery = normalizeQuery(gqlQuery);
@@ -155,7 +155,7 @@ class GraphQL extends GraphQLCore {
   ///     }
   ///   }
   /// }""", 1)
-  dynamic detail(String gqlQuery, int id, bool? useCache) async {
+  dynamic detail(String gqlQuery, int id, {bool? useCache}) async {
 
     var normalizedQuery = normalizeQuery(gqlQuery);
     var queryName = getHeaderNames(normalizedQuery)[0];

@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         },
         theme: THEME,
         routes: router,
-        initialRoute: '/examples/teams',
+        initialRoute: '/examples/login',
       ),
     );
 

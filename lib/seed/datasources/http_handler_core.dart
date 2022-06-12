@@ -1,11 +1,19 @@
 import 'dart:convert';
 import 'response.dart';
+import 'cache.dart';
 
 class HttpHandlerCore {
 
   // Retrieve http headers
-  dynamic getHeaders() {
-    String token = "";
+  dynamic getHeaders() async {
+    String? token = await CacheAPI().getToken();
+
+    if(token == null)
+      return {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      };
+
     return {
       "Accept": "application/json",
       "Content-Type": "application/json",
@@ -19,20 +27,19 @@ class HttpHandlerCore {
     switch (response.statusCode) {
       case 200:
       case 201:
-        dynamic responseJson = jsonDecode(response.body);
-        return Result(data: responseJson, status: StatusResponse.OK);
+        return Result(data: jsonDecode(response.body), status: StatusResponse.OK);
       case 400:
-        return Result(data: null, status: StatusResponse.BAD_REQUEST);
+        return Result(data: jsonDecode(response.body), status: StatusResponse.BAD_REQUEST);
       case 401:
       case 403:
-        return Result(data: null, status: StatusResponse.UNAUTHORIZED);
+        return Result(data: jsonDecode(response.body), status: StatusResponse.UNAUTHORIZED);
       case 404:
-        return Result(data: null, status: StatusResponse.NOT_FOUND);
+        return Result(data: response.body, status: StatusResponse.NOT_FOUND);
       case 408:
-        return Result(data: null, status: StatusResponse.TIME_OUT);
+        return Result(data: response.body, status: StatusResponse.TIME_OUT);
       case 500:
       default:
-        return Result(data: null, status: StatusResponse.SERVER_ERROR);
+        return Result(data: response.body, status: StatusResponse.SERVER_ERROR);
     }
   }
 
