@@ -75,4 +75,23 @@ class GraphQLCore {
     return {};
   }
 
+  Future<GraphQLClient> getClient() async {
+    String? token = await CacheAPI().getToken();
+
+    final httpLink = HttpLink(GRAPH_URL);
+    final authLink = AuthLink(
+        getToken: () async => "Token ${token??""}"
+    );
+
+    Link link = authLink.concat(httpLink);
+    link = httpLink;
+
+    GraphQLClient client = GraphQLClient(
+      cache: GraphQLCache(),
+      link: link,
+    );
+
+    return client;
+  }
+
 }

@@ -32,7 +32,7 @@ class _LoginState extends State<Login> {
         child: Scaffold(
           body: () {
             apiResponse = viewModelLoginForm.response;
-            if(apiResponse!.status == Status.COMPLETED) Navigator.pushNamed(context, "/examples");
+            if(apiResponse!.status == Status.COMPLETED) Future(() => Navigator.pushNamed(context, "/examples"));
             if(apiResponse!.status == Status.LOADING) return LoadingComponent(message: apiResponse!.message!);
             if(apiResponse!.status == Status.ERROR) return ErrorComponent(message: apiResponse!.message!);
             if(apiResponse!.status == Status.INITIAL) return buildView();

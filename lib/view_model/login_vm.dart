@@ -9,7 +9,7 @@ class ViewModelLoginForm {
   final Function refresh;
   ViewModelLoginForm(this.refresh);
 
-  AuthRepository _authRepository = AuthRepository();
+  final AuthRepository _authRepository = AuthRepository();
   BaseResponse _apiResponse = BaseResponse.initial('Empty data');
 
   BaseResponse get response => _apiResponse;

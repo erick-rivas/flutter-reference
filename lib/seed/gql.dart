@@ -1,32 +1,10 @@
 import 'package:graphql/client.dart';
 import 'datasources/cache.dart';
 import 'datasources/gql/gql_core.dart';
-import 'package:reference/settings.dart';
 
 /// @module gql
 
 class GraphQL extends GraphQLCore {
-
-  late GraphQLClient _client;
-  late Link _link;
-
-  GraphQL() {
-
-    CacheAPI().getToken().then((String? token) {
-      final _httpLink = HttpLink(GRAPH_URL);
-      final _authLink = AuthLink(
-          getToken: () async => "Token ${token??""}"
-      );
-
-      _link = _authLink.concat(_httpLink);
-      _link = _httpLink;
-      _client = GraphQLClient(
-        cache: GraphQLCache(),
-        link: _link,
-      );
-    });
-
-  }
 
   /// Execute pending http requests when the phone is offline
   void retryFailedRequests() async {
@@ -63,6 +41,8 @@ class GraphQL extends GraphQLCore {
   /// }""", paramQuery: "name=cristiano")
   dynamic query(String gqlQuery, {String? paramQuery, dynamic extraParams, bool? useCache}) async {
 
+    GraphQLClient client = await getClient();
+
     var normalizedQuery = normalizeQuery(gqlQuery);
     var queryName = getHeaderNames(gqlQuery)[0];
 
@@ -85,15 +65,15 @@ class GraphQL extends GraphQLCore {
 
     // Execute query & catch errors
     return await manageResponse(
-      _client.query(
-        QueryOptions(
-          document: gql(query),
-          fetchPolicy: FetchPolicy.networkOnly
-        )
-      ),
-      query,
-      useCache: useCache,
-      method: "QUERY"
+        client.query(
+            QueryOptions(
+                document: gql(query),
+                fetchPolicy: FetchPolicy.networkOnly
+            )
+        ),
+        query,
+        useCache: useCache,
+        method: "QUERY"
     );
 
   }
@@ -121,8 +101,8 @@ class GraphQL extends GraphQLCore {
         "pageNum": pageNum,
         "pageSize": pageSize
       },
-    useCache: useCache
-    );
+      useCache: useCache
+  );
 
   /// Return a GraphQL query count response as Map<dynamic, dynamic>
   /// @param [modelName] GraphQL model name
@@ -157,6 +137,8 @@ class GraphQL extends GraphQLCore {
   /// }""", 1)
   dynamic detail(String gqlQuery, int id, {bool? useCache}) async {
 
+    GraphQLClient client = await getClient();
+
     var normalizedQuery = normalizeQuery(gqlQuery);
     var queryName = getHeaderNames(normalizedQuery)[0];
 
@@ -166,14 +148,14 @@ class GraphQL extends GraphQLCore {
 
     //  Execute query
     return await manageResponse(
-      _client.query(
-        QueryOptions(
-          document: gql(query),
-          fetchPolicy: FetchPolicy.networkOnly
-        )
-      ),
-      query,
-      useCache: useCache
+        client.query(
+            QueryOptions(
+                document: gql(query),
+                fetchPolicy: FetchPolicy.networkOnly
+            )
+        ),
+        query,
+        useCache: useCache
     );
 
   }
@@ -185,18 +167,19 @@ class GraphQL extends GraphQLCore {
   /// @example
   /// var response = gql.save(SAVE_PLAYER, variables: {"name": "cristiano"})
   dynamic save(String query, {dynamic variables, bool? useCache}) async {
+    GraphQLClient client = await getClient();
     return await manageResponse(
-      _client.mutate(
-        MutationOptions(
-          document: gql(query),
-          variables: variables,
-          fetchPolicy: FetchPolicy.networkOnly
-        )
-      ),
-      query,
-      variables: variables,
-      useCache: useCache,
-      method: "SAVE"
+        client.mutate(
+            MutationOptions(
+                document: gql(query),
+                variables: variables,
+                fetchPolicy: FetchPolicy.networkOnly
+            )
+        ),
+        query,
+        variables: variables,
+        useCache: useCache,
+        method: "SAVE"
     );
   }
 
@@ -207,18 +190,19 @@ class GraphQL extends GraphQLCore {
   /// @example
   /// var response = gql.save(SAVE_PLAYER, variables: {"id": 1, "name": "cristiano ronaldo"})
   dynamic set(String query, {dynamic variables, bool? useCache}) async {
+    GraphQLClient client = await getClient();
     return await manageResponse(
-      _client.mutate(
-        MutationOptions(
-          document: gql(query),
-          variables: variables,
-          fetchPolicy: FetchPolicy.networkOnly
-        )
-      ),
-      query,
-      useCache: useCache,
-      variables: variables,
-      method: "SET"
+        client.mutate(
+            MutationOptions(
+                document: gql(query),
+                variables: variables,
+                fetchPolicy: FetchPolicy.networkOnly
+            )
+        ),
+        query,
+        useCache: useCache,
+        variables: variables,
+        method: "SET"
     );
   }
 
@@ -229,18 +213,19 @@ class GraphQL extends GraphQLCore {
   /// @example
   /// var response = gql.save(SAVE_PLAYER, variables: {"id": 1})
   dynamic delete(String query, {dynamic variables, bool? useCache}) async {
+    GraphQLClient client = await getClient();
     return await manageResponse(
-      _client.mutate(
-        MutationOptions(
-          document: gql(query),
-          variables: variables,
-          fetchPolicy: FetchPolicy.networkOnly
-        )
-      ),
-      query,
-      useCache: useCache,
-      variables: variables,
-      method: "DELETE"
+        client.mutate(
+            MutationOptions(
+                document: gql(query),
+                variables: variables,
+                fetchPolicy: FetchPolicy.networkOnly
+            )
+        ),
+        query,
+        useCache: useCache,
+        variables: variables,
+        method: "DELETE"
     );
   }
 
