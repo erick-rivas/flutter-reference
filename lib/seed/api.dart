@@ -46,7 +46,7 @@ class HttpHandler extends HttpHandlerCore {
     dynamic responseJson;
 
     try{
-      var response = await get(Uri.parse(url).replace(queryParameters: params), headers: getHeaders())
+      var response = await get(Uri.parse(url).replace(queryParameters: params), headers: await getHeaders())
         .timeout(const Duration(seconds: 10));
       responseJson = manageResponse(response);
     }
@@ -70,7 +70,7 @@ class HttpHandler extends HttpHandlerCore {
     dynamic responseJson;
 
     try{
-      var response = await post(Uri.parse(url), body: jsonEncode(body), headers: getHeaders())
+      var response = await post(Uri.parse(url), body: jsonEncode(body), headers: await getHeaders())
         .timeout(const Duration(seconds: 10));
       responseJson =  manageResponse(response);
     }
@@ -95,7 +95,7 @@ class HttpHandler extends HttpHandlerCore {
     dynamic responseJson;
 
     try{
-      var response = await put(Uri.parse(url), body: jsonEncode(body), headers: getHeaders())
+      var response = await put(Uri.parse(url), body: jsonEncode(body), headers: await getHeaders())
         .timeout(const Duration(seconds: 10));
       responseJson =  manageResponse(response);
     }
@@ -120,7 +120,7 @@ class HttpHandler extends HttpHandlerCore {
     dynamic responseJson;
 
     try{
-      var response = await delete(Uri.parse(url), body: jsonEncode(body), headers: getHeaders())
+      var response = await delete(Uri.parse(url), body: jsonEncode(body), headers: await getHeaders())
         .timeout(const Duration(seconds: 10));
       responseJson =  manageResponse(response);
     }

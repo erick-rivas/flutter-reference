@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:reference/ui/common/styles.dart';
 import 'package:reference/seed/utils.dart';
+import 'package:reference/view_model/login_vm.dart';
+
+import '../../repository/base_response.dart';
+import '../../seed/helpers/error.dart';
+import '../../seed/helpers/loading.dart';
 
 class Login extends StatefulWidget {
 
@@ -18,8 +23,26 @@ class _LoginState extends State<Login> {
   final _email = TextEditingController();
   final _password = TextEditingController();
 
+  late var viewModelLoginForm = ViewModelLoginForm(() => setState((){}));
+  BaseResponse? apiResponse;
+
   @override
   Widget build(BuildContext context) {
+    return SafeArea(
+        child: Scaffold(
+          body: () {
+            apiResponse = viewModelLoginForm.response;
+            if(apiResponse!.status == Status.COMPLETED) Future(() => Navigator.pushNamed(context, "/examples"));
+            if(apiResponse!.status == Status.LOADING) return LoadingComponent(message: apiResponse!.message!);
+            if(apiResponse!.status == Status.ERROR) return ErrorComponent(message: apiResponse!.message!);
+            if(apiResponse!.status == Status.INITIAL) return buildView();
+            return Container();
+          }(),
+        )
+    );
+  }
+
+  Widget buildView() {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
@@ -49,9 +72,9 @@ class _LoginState extends State<Login> {
                 width: 1.sw,
                 height: 0.07.sh,
                 child: ElevatedButton(
-                  style: BUTTON_STYLE(context, color: Theme.of(context).highlightColor),
-                  onPressed: () {},
-                  child: const Text("Log in")
+                    style: BUTTON_STYLE(context, color: Theme.of(context).highlightColor),
+                    onPressed: () { viewModelLoginForm.login(_email.text, _password.text); },
+                    child: const Text("Log in")
                 ),
               ),
               SizedBox(height: 0.05.sh),

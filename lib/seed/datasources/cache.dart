@@ -147,4 +147,9 @@ class CacheAPI {
     await prefs.setStringList("GQL_DELETE", []);
   }
 
+  Future<String?> getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("token");
+  }
+
 }
